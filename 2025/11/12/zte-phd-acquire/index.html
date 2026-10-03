@@ -41,7 +41,492 @@
           font-size: 1.6rem;
         }
       </style>
-    </head>
+    <style id="hexo-encrypt-style">
+/* ============================================================
+   hexo-encryption-auto CSS Styles (Compact & Modern)
+   ============================================================ */
+
+/* 1. Masked Text */
+.h-mask-txt,
+.hexo-encrypt-mask {
+  display: inline-block;
+  background: rgba(100, 116, 139, 0.15);
+  color: #64748b;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+  letter-spacing: 2px;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.h-enc:hover .h-mask-txt,
+.hexo-encrypt-container:hover .hexo-encrypt-mask {
+  background: rgba(99, 102, 241, 0.18);
+  color: #4f46e5;
+}
+
+/* 2. Encrypted Container (Block) */
+.h-block,
+.hexo-encrypt-block {
+  position: relative;
+  margin: 1.5rem 0;
+  border: 1px dashed rgba(100, 116, 139, 0.35);
+  border-radius: 10px;
+  background: rgba(248, 250, 252, 0.6);
+  overflow: hidden;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.h-block:hover,
+.hexo-encrypt-block:hover {
+  border-color: #6366f1;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.12);
+}
+
+.h-mask,
+.hexo-encrypt-placeholder {
+  cursor: pointer;
+  padding: 1rem;
+  position: relative;
+}
+
+/* 3. Blurred Images */
+.h-blur-img,
+.hexo-encrypt-blurred-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 0.75rem auto;
+  filter: blur(1px);
+  transition: filter 0.3s ease, transform 0.3s ease;
+  user-select: none;
+  pointer-events: none;
+}
+
+.h-enc:hover .h-blur-img,
+.hexo-encrypt-container:hover .hexo-encrypt-blurred-img {
+  filter: blur(0px);
+}
+
+/* 4. Lock Badge on Block (via CSS ::after or overlay) */
+.h-block:not(.h-unlocked) .h-mask::after,
+.hexo-encrypt-lock-overlay {
+  content: "🔒 点击输入密码解锁";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 20px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.h-block:not(.h-unlocked):hover .h-mask::after,
+.hexo-encrypt-container:hover .hexo-encrypt-lock-overlay {
+  background: #4f46e5;
+  color: #ffffff;
+  border-color: #4f46e5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+/* 5. Inline Container */
+.h-inline,
+.hexo-encrypt-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  vertical-align: baseline;
+  padding: 0 4px;
+  border-radius: 4px;
+  border-bottom: 1.5px dashed #94a3b8;
+  transition: all 0.2s ease;
+}
+
+.h-inline:hover,
+.hexo-encrypt-inline:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-bottom-color: #4f46e5;
+}
+
+.h-inline:not(.h-unlocked)::after {
+  content: " 🔒";
+  font-size: 0.75em;
+  opacity: 0.65;
+  vertical-align: baseline;
+}
+
+.h-inline:not(.h-unlocked):hover::after {
+  opacity: 1;
+}
+
+/* 6. Unlocked State */
+.h-unlocked,
+.hexo-encrypt-unlocked {
+  border-style: solid;
+  border-color: rgba(34, 197, 94, 0.3);
+  background: transparent;
+  animation: hexoEncryptFadeIn 0.35s ease;
+}
+
+.h-unlocked .h-mask,
+.hexo-encrypt-unlocked .hexo-encrypt-placeholder {
+  cursor: default;
+  padding: 0;
+}
+
+.h-unlocked .h-mask::after,
+.hexo-encrypt-unlocked .hexo-encrypt-lock-overlay,
+.hexo-encrypt-unlocked .hexo-encrypt-inline-lock {
+  display: none !important;
+}
+
+.h-unlocked.h-inline,
+.hexo-encrypt-unlocked.hexo-encrypt-inline {
+  border-bottom: none;
+  padding: 0;
+  cursor: default;
+}
+
+.h-unlocked.h-inline::after {
+  display: none !important;
+}
+
+/* Re-lock Button */
+.hexo-encrypt-relock-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 12px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
+  z-index: 10;
+}
+
+.h-block:hover .hexo-encrypt-relock-btn,
+.hexo-encrypt-block:hover .hexo-encrypt-relock-btn {
+  opacity: 1;
+}
+
+.hexo-encrypt-relock-btn:hover {
+  background: #f1f5f9;
+  color: #ef4444;
+  border-color: #fca5a5;
+}
+
+/* 7. Modal Dialog */
+.hexo-encrypt-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.hexo-encrypt-modal-overlay.hexo-encrypt-modal-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hexo-encrypt-modal-card {
+  width: 90%;
+  max-width: 360px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: scale(0.92);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
+}
+
+.hexo-encrypt-modal-active .hexo-encrypt-modal-card {
+  transform: scale(1);
+}
+
+.hexo-encrypt-modal-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  background: #eef2ff;
+  color: #4f46e5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hexo-encrypt-modal-title {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.hexo-encrypt-modal-hint {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0 0 16px;
+}
+
+.hexo-encrypt-input-group {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.hexo-encrypt-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 38px 10px 14px;
+  font-size: 0.95rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  background: #f8fafc;
+  color: #0f172a;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hexo-encrypt-input:focus {
+  border-color: #4f46e5;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.hexo-encrypt-toggle-vis {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+}
+
+.hexo-encrypt-toggle-vis:hover {
+  color: #475569;
+}
+
+.hexo-encrypt-error {
+  min-height: 18px;
+  font-size: 0.8rem;
+  color: #ef4444;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.hexo-encrypt-btn-row {
+  display: flex;
+  gap: 10px;
+}
+
+.hexo-encrypt-btn {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.hexo-encrypt-btn-primary {
+  background: #4f46e5;
+  color: #ffffff;
+}
+
+.hexo-encrypt-btn-primary:hover {
+  background: #4338ca;
+}
+
+.hexo-encrypt-btn-secondary {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.hexo-encrypt-btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+/* 8. Floating Unlock Button */
+.hexo-encrypt-floating-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 46px;
+  height: 46px;
+  background: #4f46e5;
+  color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.hexo-encrypt-floating-btn:hover {
+  transform: scale(1.08);
+  background: #4338ca;
+}
+
+/* Animations */
+@keyframes hexoEncryptFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hexoEncryptShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+.hexo-encrypt-shake {
+  animation: hexoEncryptShake 0.4s ease;
+}
+
+/* 9. Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .h-block,
+  .hexo-encrypt-block {
+    background: rgba(30, 41, 59, 0.4);
+    border-color: rgba(71, 85, 105, 0.5);
+  }
+  .h-block:not(.h-unlocked) .h-mask::after,
+  .hexo-encrypt-lock-overlay {
+    background: rgba(30, 41, 59, 0.85);
+    border-color: rgba(71, 85, 105, 0.6);
+    color: #cbd5e1;
+  }
+  .hexo-encrypt-modal-card {
+    background: #1e293b;
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .hexo-encrypt-modal-title {
+    color: #f8fafc;
+  }
+  .hexo-encrypt-modal-hint {
+    color: #94a3b8;
+  }
+  .hexo-encrypt-input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+  }
+  .hexo-encrypt-input:focus {
+    border-color: #6366f1;
+    background: #0f172a;
+  }
+  .hexo-encrypt-btn-secondary {
+    background: #334155;
+    color: #cbd5e1;
+  }
+  .hexo-encrypt-btn-secondary:hover {
+    background: #475569;
+  }
+  .hexo-encrypt-relock-btn {
+    background: rgba(30, 41, 59, 0.85);
+    border-color: rgba(71, 85, 105, 0.6);
+    color: #94a3b8;
+  }
+  .hexo-encrypt-relock-btn:hover {
+    background: #334155;
+    color: #f87171;
+  }
+}
+
+/* Support explicit dark theme classes (e.g. Next, Butterfly, Fluid) */
+html.dark .h-block,
+body.dark .h-block,
+html[data-theme='dark'] .h-block,
+html.dark .hexo-encrypt-block,
+body.dark .hexo-encrypt-block,
+html[data-theme='dark'] .hexo-encrypt-block {
+  background: rgba(30, 41, 59, 0.4);
+  border-color: rgba(71, 85, 105, 0.5);
+}
+
+html.dark .h-block:not(.h-unlocked) .h-mask::after,
+body.dark .h-block:not(.h-unlocked) .h-mask::after,
+html[data-theme='dark'] .h-block:not(.h-unlocked) .h-mask::after,
+html.dark .hexo-encrypt-lock-overlay,
+body.dark .hexo-encrypt-lock-overlay,
+html[data-theme='dark'] .hexo-encrypt-lock-overlay {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(71, 85, 105, 0.6);
+  color: #cbd5e1;
+}
+
+html.dark .hexo-encrypt-modal-card,
+body.dark .hexo-encrypt-modal-card,
+html[data-theme='dark'] .hexo-encrypt-modal-card {
+  background: #1e293b;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+html.dark .hexo-encrypt-input,
+body.dark .hexo-encrypt-input,
+html[data-theme='dark'] .hexo-encrypt-input {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+</style>
+</head>
   </html>
 </html>
 
@@ -89,10 +574,10 @@
 <p align="right">湛江一中IT社全体校友敬启</p>
 <p align="right">公元二〇二五年十一月十二日</p>
 
-<h2 id="Z-T-E-先生顺利通过博士论文答辩"><a href="#Z-T-E-先生顺利通过博士论文答辩" class="headerlink" title="Z.T.E.先生顺利通过博士论文答辩"></a>Z.T.E.先生顺利通过博士论文答辩</h2><p>2025年11月12日下午，湛江一中IT社联合创始人兼首任社长Z.T.E.先生顺利通过博士论文答辩，成功完成其博士学位阶段的重要里程碑。在此，湛江一中IT社及各地校友会向他表示热烈祝贺。</p>
-<p>作为社团联合创始人和首任社长，Z.T.E.先生在社团早期的发展过程中发挥了关键作用。在任期间，他积极推动社团制度建设与活动探索，为之后社团的持续运行奠定了基础。同时，在各地校友会的联系与组织工作中，他也长期承担协调与沟通角色，为校友网络的形成与延续付出了大量心力。</p>
-<p>高中毕业后，Z.T.E. 先生被深圳B大学录取，就读计算机科学与技术专业；本科阶段成绩优异，后被香港C大学录取攻读博士学位。攻读博士期间，他聚焦前沿科研问题，先后以第一作者身份在多个CCF A类顶级学术会议上发表论文3篇，展现出扎实的科研能力与持续的学术投入。</p>
-<p>Z.T.E.先生的成长经历，既延续了湛江一中“自强不息，追求卓越”的精神，也为IT社及各地校友树立了兼具专业深度与公共担当的榜样。让我们向他表示由衷的祝贺，并期待他在今后的科研工作与职业发展中继续取得新的成绩，也期盼他在未来一如既往关心和支持母校与社团建设。</p>
+<h2 id="Z-T-E-先生顺利通过博士论文答辩"><a href="#Z-T-E-先生顺利通过博士论文答辩" class="headerlink" title="Z.T.E.先生顺利通过博士论文答辩"></a><span class="h-enc h-inline" data-cipher="YU9+pPBCHZO0fm8Y2erGBQ==.K5p5bDhLSqno8KLS.XZcGPwizsqvprjDb2o5Zuw==.FFSFdkI0f6F8"><span class="h-mask-txt">Z.T.E.</span></span>先生顺利通过博士论文答辩</h2><p>2025年11月12日下午，湛江一中IT社联合创始人兼首任社长<span class="h-enc h-inline" data-cipher="ad7m8v4ujTH2kp7uxB2txQ==.EiSro7qPzn18BWP/.dkFnHENnuEbB336I0wyrcA==.znNlFVpBpjIF"><span class="h-mask-txt">Z.T.E.</span></span>先生顺利通过博士论文答辩，成功完成其博士学位阶段的重要里程碑。在此，湛江一中IT社及各地校友会向他表示热烈祝贺。</p>
+<p>作为社团联合创始人和首任社长，<span class="h-enc h-inline" data-cipher="ySlyZMtaR61bzSFnW7DSDw==.gGgLJ582vC3FdCgI.fG/ItSFldyZszRXcVERsEQ==.w+AgfOmSou+R"><span class="h-mask-txt">Z.T.E.</span></span>先生在社团早期的发展过程中发挥了关键作用。在任期间，他积极推动社团制度建设与活动探索，为之后社团的持续运行奠定了基础。同时，在各地校友会的联系与组织工作中，他也长期承担协调与沟通角色，为校友网络的形成与延续付出了大量心力。</p>
+<p>高中毕业后，<span class="h-enc h-inline" data-cipher="qpT3VllGvdhKkNsvo03C9g==.QqcJwDjSb9Ay6hWf.wFeeVAwh8JTpZMzSmyG9Ug==.W9JoxEdnij6H"><span class="h-mask-txt">Z.T.E.</span></span>先生被<span class="h-enc h-inline" data-cipher="X5Ejd2/CN5yH1UDK0IwJAQ==.SKNHlO6EzwIxipNM.wztC8AU0P2NqFLzt3JIoiQ==.9PpzOlzuFQI97f+4Hu4VVkih"><span class="h-mask-txt">深圳B大学</span></span>录取，就读计算机科学与技术专业；本科阶段成绩优异，后被<span class="h-enc h-inline" data-cipher="edOoxatN1giRlRCnbjZIMA==.7+M52tk/8+TRhZ0h.JLBBYEV6MptCXot5neAzow==.GUPaUCaX8cUiRGMhvdy4Rb1R"><span class="h-mask-txt">香港C大学</span></span>录取攻读博士学位。攻读博士期间，他聚焦前沿科研问题，先后以第一作者身份在多个CCF A类顶级学术会议上发表论文3篇，展现出扎实的科研能力与持续的学术投入。</p>
+<p><span class="h-enc h-inline" data-cipher="68km4DzhbuyixehIm3Oskw==.Wm8NP5hrRqyJ91yZ.EDnkjHrM/bXsi8TrBRlUYg==.GF/G3XsfH/zp"><span class="h-mask-txt">Z.T.E.</span></span>先生的成长经历，既延续了湛江一中“自强不息，追求卓越”的精神，也为IT社及各地校友树立了兼具专业深度与公共担当的榜样。让我们向他表示由衷的祝贺，并期待他在今后的科研工作与职业发展中继续取得新的成绩，也期盼他在未来一如既往关心和支持母校与社团建设。</p>
 <p align="right">湛江一中IT社全体校友敬上</p>
 <p align="right">2025年11月12日</p> 
       <!-- reward -->
@@ -464,6 +949,432 @@
     
 
   </div>
+<script id="hexo-encrypt-script">
+window.__HEXO_ENCRYPT_CONFIG__ = {"cachePassword":true,"storageType":"sessionStorage","floatingButton":true,"relockButton":true};
+/**
+ * hexo-encryption-auto Frontend Client
+ * Pure Vanilla JS using native Web Crypto API (SubtleCrypto)
+ */
+(function () {
+  'use strict';
+
+  // Config options embedded or defaulted
+  const config = window.__HEXO_ENCRYPT_CONFIG__ || {
+    cachePassword: true,
+    storageType: 'sessionStorage',
+    floatingButton: true,
+    relockButton: true
+  };
+
+  const STORAGE_KEY = 'hexo_encrypt_cache';
+
+  // Convert Base64 string to Uint8Array
+  function base64ToUint8Array(base64) {
+    const binary = atob(base64);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  }
+
+  /**
+   * Decrypt AES-256-GCM with PBKDF2 using Web Crypto API
+   * @param {{ salt: string, iv: string, tag: string, cipher: string }} payload
+   * @param {string} password
+   * @returns {Promise<string>} Decrypted HTML
+   */
+  async function decryptData(payload, password) {
+    if (!window.crypto || !window.crypto.subtle) {
+      throw new Error('Web Crypto API 不可用（请确保在 HTTPS 或 localhost 环境下访问）');
+    }
+
+    const salt = base64ToUint8Array(payload.salt);
+    const iv = base64ToUint8Array(payload.iv);
+    const tag = base64ToUint8Array(payload.tag);
+    const cipher = base64ToUint8Array(payload.cipher);
+
+    // SubtleCrypto expects cipher + tag combined
+    const combined = new Uint8Array(cipher.length + tag.length);
+    combined.set(cipher);
+    combined.set(tag, cipher.length);
+
+    const enc = new TextEncoder();
+    const keyMaterial = await window.crypto.subtle.importKey(
+      'raw',
+      enc.encode(password),
+      'PBKDF2',
+      false,
+      ['deriveKey']
+    );
+
+    const derivedKey = await window.crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt: salt,
+        iterations: 100000,
+        hash: 'SHA-256'
+      },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['decrypt']
+    );
+
+    const decryptedBuf = await window.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: iv },
+      derivedKey,
+      combined
+    );
+
+    return new TextDecoder().decode(decryptedBuf);
+  }
+
+  // Storage Helpers
+  function getCachedPasswords() {
+    if (!config.cachePassword) return [];
+    try {
+      const storage = config.storageType === 'localStorage' ? window.localStorage : window.sessionStorage;
+      const data = storage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveCachedPassword(password) {
+    if (!config.cachePassword || !password) return;
+    try {
+      const storage = config.storageType === 'localStorage' ? window.localStorage : window.sessionStorage;
+      const passwords = getCachedPasswords();
+      if (!passwords.includes(password)) {
+        passwords.push(password);
+        storage.setItem(STORAGE_KEY, JSON.stringify(passwords));
+      }
+    } catch (e) {}
+  }
+
+  function clearCachedPasswords() {
+    try {
+      const storage = config.storageType === 'localStorage' ? window.localStorage : window.sessionStorage;
+      storage.removeItem(STORAGE_KEY);
+    } catch (e) {}
+  }
+
+  // Modal Dialog Controller
+  class EncryptModal {
+    constructor() {
+      this.overlay = null;
+      this.input = null;
+      this.errorEl = null;
+      this.hintEl = null;
+      this.titleEl = null;
+      this.targetContainer = null;
+      this.initDom();
+    }
+
+    initDom() {
+      const overlay = document.createElement('div');
+      overlay.className = 'hexo-encrypt-modal-overlay';
+      overlay.innerHTML = `
+        <div class="hexo-encrypt-modal-card" role="dialog" aria-modal="true">
+          <div class="hexo-encrypt-modal-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h3 class="hexo-encrypt-modal-title">访问受保护内容</h3>
+          <div class="hexo-encrypt-modal-hint" style="display:none;"></div>
+          <div class="hexo-encrypt-input-group">
+            <input type="password" class="hexo-encrypt-input" placeholder="请输入密码" autocomplete="current-password" />
+            <button type="button" class="hexo-encrypt-toggle-vis" title="显示/隐藏密码">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+          <div class="hexo-encrypt-error"></div>
+          <div class="hexo-encrypt-btn-row">
+            <button type="button" class="hexo-encrypt-btn hexo-encrypt-btn-secondary hexo-encrypt-btn-cancel">取消</button>
+            <button type="button" class="hexo-encrypt-btn hexo-encrypt-btn-primary hexo-encrypt-btn-submit">解锁</button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(overlay);
+
+      this.overlay = overlay;
+      this.input = overlay.querySelector('.hexo-encrypt-input');
+      this.errorEl = overlay.querySelector('.hexo-encrypt-error');
+      this.hintEl = overlay.querySelector('.hexo-encrypt-modal-hint');
+      this.titleEl = overlay.querySelector('.hexo-encrypt-modal-title');
+
+      const submitBtn = overlay.querySelector('.hexo-encrypt-btn-submit');
+      const cancelBtn = overlay.querySelector('.hexo-encrypt-btn-cancel');
+      const toggleVisBtn = overlay.querySelector('.hexo-encrypt-toggle-vis');
+
+      submitBtn.addEventListener('click', () => this.submit());
+      cancelBtn.addEventListener('click', () => this.close());
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) this.close();
+      });
+
+      this.input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.submit();
+        } else if (e.key === 'Escape') {
+          this.close();
+        }
+      });
+
+      toggleVisBtn.addEventListener('click', () => {
+        const isPass = this.input.type === 'password';
+        this.input.type = isPass ? 'text' : 'password';
+      });
+    }
+
+    open(container) {
+      this.targetContainer = container;
+      this.errorEl.textContent = '';
+      this.input.value = '';
+      this.input.type = 'password';
+
+      const cipherEl = container ? container.querySelector('.hexo-encrypt-cipher') : null;
+      const hint = container ? (container.dataset.hint || (cipherEl ? cipherEl.dataset.hint : '')) : '';
+      const title = container ? (container.dataset.title || (cipherEl ? cipherEl.dataset.title : '')) : '';
+
+      if (title) {
+        this.titleEl.textContent = title;
+      } else {
+        this.titleEl.textContent = '访问受保护内容';
+      }
+
+      if (hint) {
+        this.hintEl.textContent = `提示：${hint}`;
+        this.hintEl.style.display = 'block';
+      } else {
+        this.hintEl.style.display = 'none';
+      }
+
+      this.overlay.classList.add('hexo-encrypt-modal-active');
+      setTimeout(() => this.input.focus(), 100);
+    }
+
+    close() {
+      this.overlay.classList.remove('hexo-encrypt-modal-active');
+      this.targetContainer = null;
+    }
+
+    async submit() {
+      const password = this.input.value.trim();
+      if (!password) {
+        this.showError('请输入访问密码');
+        return;
+      }
+
+      this.errorEl.textContent = '正在解密...';
+      const success = await unlockWithPassword(password, this.targetContainer);
+
+      if (success) {
+        saveCachedPassword(password);
+        this.close();
+      } else {
+        this.showError('密码错误，请重新输入');
+      }
+    }
+
+    showError(msg) {
+      this.errorEl.textContent = msg;
+      const card = this.overlay.querySelector('.hexo-encrypt-modal-card');
+      card.classList.remove('hexo-encrypt-shake');
+      void card.offsetWidth; // Trigger reflow
+      card.classList.add('hexo-encrypt-shake');
+      this.input.focus();
+    }
+  }
+
+  let modal = null;
+
+  function getCipherPayload(container) {
+    const raw = container.dataset.cipher;
+    if (raw && raw.includes('.')) {
+      const parts = raw.split('.');
+      if (parts.length === 4) {
+        return { salt: parts[0], iv: parts[1], tag: parts[2], cipher: parts[3] };
+      }
+    }
+    const cipherEl = container.querySelector('.hexo-encrypt-cipher');
+    if (cipherEl) {
+      return {
+        salt: cipherEl.dataset.salt,
+        iv: cipherEl.dataset.iv,
+        tag: cipherEl.dataset.tag,
+        cipher: cipherEl.dataset.cipher
+      };
+    }
+    return null;
+  }
+
+  /**
+   * Unlock a specific container or all matching containers
+   * @param {string} password
+   * @param {HTMLElement} [preferredContainer]
+   * @returns {Promise<boolean>}
+   */
+  async function unlockWithPassword(password, preferredContainer) {
+    let anySuccess = false;
+    const containers = Array.from(document.querySelectorAll('.h-enc:not(.h-unlocked), .hexo-encrypt-container:not(.hexo-encrypt-unlocked)'));
+
+    // Try target first if provided
+    const sortedContainers = preferredContainer && containers.includes(preferredContainer)
+      ? [preferredContainer, ...containers.filter(c => c !== preferredContainer)]
+      : containers;
+
+    for (const container of sortedContainers) {
+      const payload = getCipherPayload(container);
+      if (!payload || !payload.salt || !payload.cipher) continue;
+
+      try {
+        const decryptedHtml = await decryptData(payload, password);
+        applyDecryption(container, decryptedHtml);
+        anySuccess = true;
+      } catch (err) {
+        // Wrong password for this block or decryption failed
+      }
+    }
+
+    return anySuccess;
+  }
+
+  /**
+   * Replace placeholder with decrypted content
+   * @param {HTMLElement} container
+   * @param {string} decryptedHtml
+   */
+  function applyDecryption(container, decryptedHtml) {
+    const placeholderEl = container.querySelector('.h-mask, .hexo-encrypt-placeholder') || container;
+
+    // Cache original placeholder for re-locking
+    if (!container._originalHtml) {
+      container._originalHtml = placeholderEl.innerHTML;
+    }
+
+    placeholderEl.innerHTML = decryptedHtml;
+    container.classList.add('h-unlocked', 'hexo-encrypt-unlocked');
+
+    // Add re-lock button if block container
+    if (config.relockButton && (container.classList.contains('h-block') || container.classList.contains('hexo-encrypt-block'))) {
+      let relockBtn = container.querySelector('.hexo-encrypt-relock-btn');
+      if (!relockBtn) {
+        relockBtn = document.createElement('button');
+        relockBtn.className = 'hexo-encrypt-relock-btn';
+        relockBtn.title = '重新锁定此内容';
+        relockBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>锁定</span>
+        `;
+        relockBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          relockContainer(container);
+        });
+        container.appendChild(relockBtn);
+      }
+    }
+
+    // Dispatch custom event for plugins/themes (e.g. image zoom, mathjax)
+    window.dispatchEvent(new CustomEvent('hexo-encrypt:unlocked', {
+      detail: { container, decryptedHtml }
+    }));
+  }
+
+  /**
+   * Re-lock an unlocked container
+   * @param {HTMLElement} container
+   */
+  function relockContainer(container) {
+    if (!container._originalHtml) return;
+    const placeholderEl = container.querySelector('.h-mask, .hexo-encrypt-placeholder') || container;
+    placeholderEl.innerHTML = container._originalHtml;
+    container.classList.remove('h-unlocked', 'hexo-encrypt-unlocked');
+
+    const relockBtn = container.querySelector('.hexo-encrypt-relock-btn');
+    if (relockBtn) {
+      relockBtn.remove();
+    }
+
+    clearCachedPasswords();
+
+    window.dispatchEvent(new CustomEvent('hexo-encrypt:locked', {
+      detail: { container }
+    }));
+  }
+
+  /**
+   * Initialize all encrypted elements on the page
+   */
+  function init() {
+    const containers = document.querySelectorAll('.h-enc, .hexo-encrypt-container');
+    if (!containers || containers.length === 0) return;
+
+    if (!modal) {
+      modal = new EncryptModal();
+    }
+
+    containers.forEach((container) => {
+      container.addEventListener('click', (e) => {
+        if (container.classList.contains('h-unlocked') || container.classList.contains('hexo-encrypt-unlocked')) return;
+        modal.open(container);
+      });
+    });
+
+    // Floating unlock button
+    if (config.floatingButton && !document.querySelector('.hexo-encrypt-floating-btn')) {
+      const floatBtn = document.createElement('button');
+      floatBtn.className = 'hexo-encrypt-floating-btn';
+      floatBtn.title = '解锁受保护内容';
+      floatBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      `;
+      floatBtn.addEventListener('click', () => {
+        const firstLocked = document.querySelector('.h-enc:not(.h-unlocked), .hexo-encrypt-container:not(.hexo-encrypt-unlocked)');
+        modal.open(firstLocked);
+      });
+      document.body.appendChild(floatBtn);
+    }
+
+    // Try auto-unlock from cached passwords
+    const cached = getCachedPasswords();
+    if (cached && cached.length > 0) {
+      for (const pass of cached) {
+        unlockWithPassword(pass);
+      }
+    }
+  }
+
+  // Run on DOMContentLoaded or immediately if already loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // Also support PJAX navigation (popular in Hexo themes like NexT, Butterfly)
+  document.addEventListener('pjax:success', init);
+  document.addEventListener('pjax:complete', init);
+  document.addEventListener('turbo:load', init);
+})();
+
+</script>
 </body>
 
 </html>
