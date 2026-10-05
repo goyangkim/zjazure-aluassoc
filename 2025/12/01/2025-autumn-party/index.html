@@ -100,15 +100,13 @@
   height: auto;
   border-radius: 8px;
   margin: 0.75rem auto;
-  filter: blur(1px);
-  transition: filter 0.3s ease, transform 0.3s ease;
   user-select: none;
-  pointer-events: none;
+  pointer-events: none !important;
+  transition: transform 0.3s ease;
 }
 
-.h-enc:hover .h-blur-img,
-.hexo-encrypt-container:hover .hexo-encrypt-blurred-img {
-  filter: blur(0px);
+.h-mask .caption {
+  pointer-events: none;
 }
 
 /* 4. Lock Badge on Block (via CSS ::after or overlay) */
@@ -569,8 +567,8 @@ html[data-theme='dark'] .hexo-encrypt-input {
     <div class="article-entry" itemprop="articleBody">
        
   <p>2025年11月29日，湛江一中IT社校友会在多个城市同步举行了季度交流会，汇聚了来自广州、香港和湛江等地的杰出校友，成为一次富有意义的交流与合作平台。</p>
-<p>本日，香港校友会校友<span class="h-enc h-inline" data-cipher="wAW9s12rKGIwdCDpnpR5IQ==.Zzvrk6PdeFDAaM5t.E+6wrEMKBAKJvebhwTr30w==.VXB2fPCet7JI"><span class="h-mask-txt">Z.T.E.</span></span>博士从香港专程返湛，与湛江校友会成员<span class="h-enc h-inline" data-cipher="wEZx77vdu09WMYag0dNArg==.6cEKmSbhhMwtgX6G.tnFucfKgpe5zReCvyYhf4A==.h6IF581jfztOEves5yBi13AN/kr8Q5Tymjnlqt/4gW9C"><span class="h-mask-txt">C.F.L.、K.H.</span></span>等人进行了深度会谈。大家分享了全球科技发展趋势、跨境电商机遇及投资合作的最新动态，推动了校友间的合作与资源整合。<span class="h-enc h-inline" data-cipher="x5XBR1cZCtzOSPA0dpiV3w==.mATTlaKevb6za6rT.gHYAihBFU4AluLSbsVdgiw==.BKJkHZMARJnU"><span class="h-mask-txt">Z.T.E.</span></span>博士表示，虽然身在海外，依然深感母校的培养，并愿为母校发展贡献力量。</p>
-<p>同日，广州校友会的交流会上，三位校友——<span class="h-enc h-inline" data-cipher="EH6ZI2GjXRnKmHHcGYda1A==.9uzdJml71mai8dvh.qIPfFv9BVztk7SfIDpbBzQ==.PPWA5nkyNGWlTYpViSfPz9ACZOYh1aTwoyjPW3YIYi/A"><span class="h-mask-txt">S.Z.、P.Z.</span></span>等，围绕科技、金融及企业管理等领域展开讨论，气氛热烈。校友们共同探讨行业创新与人才培养，交流中充满了启发与合作机会。</p>
+<p>本日，香港校友会校友<span class="h-enc h-inline" data-cipher="QDt2n59b73btX1V/le0brQ==.SSy8Jt6uJV6nzlLo.ax7vo72WSzuUHOk/nbbQ6w==.nRKe9E4pOcfa"><span class="h-mask-txt">Z.T.E.</span></span>博士从香港专程返湛，与湛江校友会成员<span class="h-enc h-inline" data-cipher="ogpOVgrg4EwCUhOxeteVaQ==.yH4QnudW7MkBJJU3.4XKc+VLQaCTSoKRwXm1gkA==.CjoivlMq+Urtth48eyKI6lARlRtkhuPWVpRiOHBYd574"><span class="h-mask-txt">C.F.L.、K.H.</span></span>等人进行了深度会谈。大家分享了全球科技发展趋势、跨境电商机遇及投资合作的最新动态，推动了校友间的合作与资源整合。<span class="h-enc h-inline" data-cipher="iio7RIlE9ZO4yGhn6zVgVQ==.mteHx/k8B4xZp5vs.wuMcSFSDqvdfQKLZF/bO2w==.xiunv4Eb+Wfq"><span class="h-mask-txt">Z.T.E.</span></span>博士表示，虽然身在海外，依然深感母校的培养，并愿为母校发展贡献力量。</p>
+<p>同日，广州校友会的交流会上，三位校友——<span class="h-enc h-inline" data-cipher="vpZEEras3KNOdKvcPsbJMw==.Hrc0LwSXsxAb66kZ.QTiO/FKK/G/NPtPySt3bGA==.1tEpAWU9EEaI5xQkHn4Mnf1v33e8dLzkq/XP35mjaNvD"><span class="h-mask-txt">S.Z.、P.Z.</span></span>等，围绕科技、金融及企业管理等领域展开讨论，气氛热烈。校友们共同探讨行业创新与人才培养，交流中充满了启发与合作机会。</p>
 <p>本次活动的主题为“携手共进，创新未来”，体现了湛江一中IT社校友们共同的愿景。无论身处何地，校友们始终保持紧密联系，通过交流与合作推动个人和集体的发展，为社会贡献力量。</p>
  
       <!-- reward -->
@@ -1285,6 +1283,13 @@ window.__HEXO_ENCRYPT_CONFIG__ = {"cachePassword":true,"storageType":"sessionSto
     window.dispatchEvent(new CustomEvent('hexo-encrypt:unlocked', {
       detail: { container, decryptedHtml }
     }));
+
+    // Re-bind theme lightbox if available (e.g. PhotoSwipe in Ayer theme)
+    if (typeof window.viewer_init === 'function') {
+      try {
+        window.viewer_init();
+      } catch (e) {}
+    }
   }
 
   /**
